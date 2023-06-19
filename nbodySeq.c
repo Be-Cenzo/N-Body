@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
   }
 
   end = MPI_Wtime();
-  printf("Tempo: %0.3f\n", end-start);
+	printf("Tempo di esecuzione: %0.3f\tNumero di bodies: %d\tNumero di processi: %d\tprogramma: %s\n", end-start, nBodies, world_size, argv[0]);
   saveResults(end-start, nBodies, 1, risultati, argv[0]);
 	
   free(buf);
