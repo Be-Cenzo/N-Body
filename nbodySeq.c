@@ -38,13 +38,13 @@ int main(int argc, char** argv) {
   
   int nBodies = 30000;
   if (argc > 1) nBodies = atoi(argv[1]);
-  char* risultati = argc > 2 ? argv[2] : "nbodySeq.txt";
+  char* risultati = argc > 3 ? argv[3] : "nbodySeq.txt";
 
   double start, end;
 	start = MPI_Wtime();
 
   const float dt = 0.01f; // time step
-  const int nIters = 10;  // simulation iterations
+	int nIters = argc > 2 ? atoi(argv[2]) : 10; // simulation iterations
 
   int bytes = nBodies*sizeof(Body);
   float *buf = (float*)malloc(bytes);
@@ -66,8 +66,8 @@ int main(int argc, char** argv) {
   }
 
   end = MPI_Wtime();
-	printf("Tempo di esecuzione: %0.3f\tNumero di bodies: %d\tNumero di processi: %d\tprogramma: %s\n", end-start, nBodies, world_size, argv[0]);
-  saveResults(end-start, nBodies, 1, risultati, argv[0]);
+	printf("Tempo di esecuzione: %0.3f\tNumero di bodies: %d\tNumero di processi: %d\tprogramma: %s\titerazioni:%d\n", end-start, nBodies, world_size, argv[0], nIters);
+  saveResults(end-start, nBodies, 1, risultati, argv[0], nIters);
 	
   free(buf);
 }

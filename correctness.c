@@ -25,11 +25,11 @@ void updateOutput(float *bodies, int nBodies, char* name){
     fclose(fp);
 }
 
-void saveResults(float time, int nBodies, int processess, char* name, char* program){
+void saveResults(float time, int nBodies, int processess, char* name, char* program, int nIters){
     FILE *fp;
 
     fp = fopen(name, "w");
-    fprintf(fp, "Tempo di esecuzione: %0.3f\tNumero di bodies: %d\tNumero di processi: %d\tprogramma: %s\n", time, nBodies, processess, program);
+    fprintf(fp, "Tempo di esecuzione: %0.3f\tNumero di bodies: %d\tNumero di processi: %d\tprogramma: %s\titerazioni: %d\n", time, nBodies, processess, program, nIters);
 }
 
 int isCorrect(char* f1, char* f2){

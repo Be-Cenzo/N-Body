@@ -130,7 +130,7 @@ void calculateDisplacements(int nBodies, int processes, int myrank, int* dim, in
 int main(int argc, char** argv) {
 	MPI_Init(&argc, &argv);
 	
-	char* risultati = argc > 2 ? argv[2] : "results.txt";
+	char* risultati = argc > 3 ? argv[3] : "results.txt";
 
 	double start, end;
 	start = MPI_Wtime();
@@ -154,7 +154,7 @@ int main(int argc, char** argv) {
 	calculateDisplacements(nBodies, world_size, myrank, &dim, &offset, receive_counts, displacements);
 
 	const float dt = 0.01f; // time step
-	const int nIters = 10;  // simulation iterations
+	int nIters = argc > 2 ? atoi(argv[2]) : 10; // simulation iterations
 
 	int bytes = nBodies*sizeof(Body);
 	float *buf = (float*)malloc(bytes);
@@ -193,8 +193,8 @@ int main(int argc, char** argv) {
 
 	end = MPI_Wtime();
 	if(myrank == 0){
-		printf("Tempo di esecuzione: %0.3f\tNumero di bodies: %d\tNumero di processi: %d\tprogramma: %s\n", end-start, nBodies, world_size, argv[0]);
-		saveResults(end-start, nBodies, world_size, risultati, argv[0]);
+		printf("Tempo di esecuzione: %0.3f\tNumero di bodies: %d\tNumero di processi: %d\tprogramma: %s\titerazioni:%d\n", end-start, nBodies, world_size, argv[0], nIters);
+		saveResults(end-start, nBodies, world_size, risultati, argv[0], nIters);
 	}
 	MPI_Finalize();
 	return 0;
