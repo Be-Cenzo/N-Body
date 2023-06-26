@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <mpi.h>
 #include "correctness.h"
+#include <string.h>
 
 #define SOFTENING 1e-9f
 
@@ -121,6 +122,7 @@ int main(int argc, char** argv) {
 	MPI_Init(&argc, &argv);
 	
 	char* risultati = argc > 3 ? argv[3] : "output.txt";
+	char* file = argc > 4 ? argv[4] : "file.txt";
 	
 	double start, end;
 	start = MPI_Wtime();
@@ -167,7 +169,8 @@ int main(int argc, char** argv) {
 	}
 	
 	for (int iter = 2; iter <= nIters; iter++) {
-		loadBuffer(p, offset, dim, myBodies);
+		//loadBuffer(p, offset, dim, myBodies);
+		memcpy(myBodies, p+offset, sizeof(Body)*dim);
 		sendAndReceive(world_size, myrank, myBodies, displacements, receive_counts, bodyDataType, requests, p);
 		
 		myBodyForces(p, dt, displacements[myrank], receive_counts[myrank]);
@@ -185,6 +188,9 @@ int main(int argc, char** argv) {
 		}
 	}
 	MPI_Gatherv(p + offset, dim, bodyDataType, p, receive_counts, displacements, bodyDataType, 0, MPI_COMM_WORLD);
+
+	if(myrank == 0)
+		saveOutput(buf, nBodies, file);
 
 	free(buf);
 	free(myBodies);
