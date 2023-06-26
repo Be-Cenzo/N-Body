@@ -34,10 +34,6 @@ void bodyForce(Body *p, float dt, int offset, int n, int allBodies) {
   }
 }
 
-void bodyPrint(Body *p){
-  printf("x: %.4f, y: %.4f, z: %.4f, vx: %.2f, vy: %.2f, vz: %.2f\n", p->x, p->y, p->z, p->vx, p->vy, p->vz);
-}
-
 void calculateDisplacements(int nBodies, int processes, int myrank, int* dim, int* offset, int* receive_counts, int* displacements){
 	int resto = nBodies%processes;
 	*dim = nBodies/processes;
@@ -62,13 +58,13 @@ int main(int argc, char** argv) {
 	MPI_Init(&argc, &argv);
 	
 	char* risultati = argc > 3 ? argv[3] : "results.txt";
-	
+
 	double start, end;
 	start = MPI_Wtime();
 	
 	int world_size;
-	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 	int myrank;
+	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
 	int nBodies = 30000;
@@ -106,7 +102,6 @@ int main(int argc, char** argv) {
 			p[i + offset].z += p[i + offset].vz*dt;
 		}
 		MPI_Gatherv(p + offset, dim, bodyDataType, p, receive_counts, displacements, bodyDataType, 0, MPI_COMM_WORLD);
-
 	}
 
 	free(buf);

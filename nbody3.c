@@ -73,10 +73,6 @@ void otherBodyForces(Body *p, float dt, int offset, int dim, int otherOffset, in
   	}
 }
 
-void bodyPrint(Body *p){
-    printf("x: %.4f, y: %.4f, z: %.4f, vx: %.2f, vy: %.2f, vz: %.2f\n", p->x, p->y, p->z, p->vx, p->vy, p->vz);
-}
-
 void calculateDisplacements(int nBodies, int processes, int myrank, int* dim, int* offset, int* receive_counts, int* displacements){
 	int resto = nBodies%processes;
 	*dim = nBodies/processes;
@@ -97,13 +93,27 @@ void calculateDisplacements(int nBodies, int processes, int myrank, int* dim, in
 	*offset = displacements[myrank];
 }
 
-void sendAndReceive(int world_size, int myrank, Body *p, int displacements[], int receive_counts[], MPI_Datatype bodyDataType, MPI_Request requests[], Body *rcv){
+void sendAndReceive(int world_size, int myrank, Body *myBodies, int displacements[], int receive_counts[], MPI_Datatype bodyDataType, MPI_Request requests[], Body *rcv){
 	for(int i = 0; i<world_size; i++){
         if(i == myrank)
-            MPI_Ibcast(p + displacements[myrank], receive_counts[myrank], bodyDataType, i, MPI_COMM_WORLD, &requests[myrank]);
+            MPI_Ibcast(myBodies, receive_counts[myrank], bodyDataType, i, MPI_COMM_WORLD, &requests[myrank]);
         else
             MPI_Ibcast(rcv + displacements[i], receive_counts[i], bodyDataType, i, MPI_COMM_WORLD, &requests[i]);
     }
+}
+
+
+void loadBuffer(Body* from, int offset, int dim, Body* to){
+	int myIndex = offset;
+	for(int i = 0; i < dim ; i++){
+		to[i].vx = from[myIndex].vx;
+		to[i].vy = from[myIndex].vy;
+		to[i].vz = from[myIndex].vz;
+		to[i].x = from[myIndex].x;
+		to[i].y = from[myIndex].y;
+		to[i].z = from[myIndex].z;
+		myIndex++;
+	}
 }
 
 int main(int argc, char** argv) {
@@ -116,8 +126,8 @@ int main(int argc, char** argv) {
 	start = MPI_Wtime();
 	
 	int world_size;
-	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 	int myrank;
+	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
 	int nBodies = 30000;
@@ -134,16 +144,18 @@ int main(int argc, char** argv) {
 	int bytes = nBodies*sizeof(Body);
 	float *buf = (float*)malloc(bytes);
 	Body *p = (Body*)buf;
+	Body *myBodies = malloc(dim*sizeof(Body));
 
 	randomizeBodies(buf, 6*nBodies); // Init pos / vel data
 
 	double totalTime = 0.0;
 	MPI_Datatype bodyDataType;
+	int index;
+	MPI_Status status;
     MPI_Request *requests = (MPI_Request *)malloc(world_size * sizeof(MPI_Request));
 
 	MPI_Type_contiguous(6, MPI_FLOAT, &bodyDataType);
 	MPI_Type_commit(&bodyDataType);
-
 
 
 	bodyForce(p, dt, offset, dim, nBodies); // compute interbody forces
@@ -155,14 +167,11 @@ int main(int argc, char** argv) {
 	}
 	
 	for (int iter = 2; iter <= nIters; iter++) {
-		sendAndReceive(world_size, myrank, p, displacements, receive_counts, bodyDataType, requests, p);
+		loadBuffer(p, offset, dim, myBodies);
+		sendAndReceive(world_size, myrank, myBodies, displacements, receive_counts, bodyDataType, requests, p);
 		
 		myBodyForces(p, dt, displacements[myrank], receive_counts[myrank]);
 		
-		int index;
-		MPI_Status status;
-		
-		int flag = 0;
 		for(int i = 0; i<world_size; i++){
 			MPI_Waitany(world_size, requests, &index, &status);
 			if(index != myrank)
@@ -178,6 +187,7 @@ int main(int argc, char** argv) {
 	MPI_Gatherv(p + offset, dim, bodyDataType, p, receive_counts, displacements, bodyDataType, 0, MPI_COMM_WORLD);
 
 	free(buf);
+	free(myBodies);
 
 	MPI_Type_free(&bodyDataType);
 	
