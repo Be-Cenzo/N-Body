@@ -189,9 +189,6 @@ int main(int argc, char** argv) {
 	}
 	MPI_Gatherv(p + offset, dim, bodyDataType, p, receive_counts, displacements, bodyDataType, 0, MPI_COMM_WORLD);
 
-	if(myrank == 0)
-		saveOutput(buf, nBodies, file);
-
 	free(buf);
 	free(myBodies);
 
