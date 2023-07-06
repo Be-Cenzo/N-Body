@@ -39,6 +39,7 @@ int main(int argc, char** argv) {
   int nBodies = 30000;
   if (argc > 1) nBodies = atoi(argv[1]);
   char* risultati = argc > 3 ? argv[3] : "nbodySeq.txt";
+	char* file = argc > 4 ? argv[4] : "file.txt";
 
   double start, end;
 	start = MPI_Wtime();
@@ -66,7 +67,7 @@ int main(int argc, char** argv) {
   }
 
   end = MPI_Wtime();
-	printf("Tempo di esecuzione: %0.3f\tNumero di bodies: %d\tNumero di processi: %d\tprogramma: %s\titerazioni:%d\n", end-start, nBodies, world_size, argv[0], nIters);
+	printf("Tempo di esecuzione: %0.3f\tNumero di bodies: %d\tNumero di processi: 1\tprogramma: %s\titerazioni:%d\n", end-start, nBodies, argv[0], nIters);
   saveResults(end-start, nBodies, 1, risultati, argv[0], nIters);
 	
   free(buf);

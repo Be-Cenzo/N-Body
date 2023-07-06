@@ -1,0 +1,60 @@
+SCALABILITÀ FORTE
+Numero di body: 10000 , numero iterazioni: 10
+Tempo di esecuzione: 17.737     Numero di bodies: 10000 Numero di processi: 1   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 8.907      Numero di bodies: 10000 Numero di processi: 2   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 4.471      Numero di bodies: 10000 Numero di processi: 4   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 2.348      Numero di bodies: 10000 Numero di processi: 8   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 1.514      Numero di bodies: 10000 Numero di processi: 12  programma: nbody3       iterazioni:10
+Tempo di esecuzione: 1.168      Numero di bodies: 10000 Numero di processi: 16  programma: nbody3       iterazioni:10
+
+
+
+Numero di body: 30000 , numero iterazioni: 10
+Tempo di esecuzione: 159.652    Numero di bodies: 30000 Numero di processi: 1   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 80.492     Numero di bodies: 30000 Numero di processi: 2   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 40.304     Numero di bodies: 30000 Numero di processi: 4   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 21.230     Numero di bodies: 30000 Numero di processi: 8   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 13.770     Numero di bodies: 30000 Numero di processi: 12  programma: nbody3       iterazioni:10
+Tempo di esecuzione: 10.176     Numero di bodies: 30000 Numero di processi: 16  programma: nbody3       iterazioni:10
+
+
+
+Numero di body: 50000 , numero iterazioni: 10
+Tempo di esecuzione: 445.525    Numero di bodies: 50000 Numero di processi: 1   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 225.802    Numero di bodies: 50000 Numero di processi: 2   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 112.507    Numero di bodies: 50000 Numero di processi: 4   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 63.709     Numero di bodies: 50000 Numero di processi: 8   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 41.667     Numero di bodies: 50000 Numero di processi: 12  programma: nbody3       iterazioni:10
+Tempo di esecuzione: 31.107     Numero di bodies: 50000 Numero di processi: 16  programma: nbody3       iterazioni:10
+
+
+
+
+SCALABILITÀ DEBOLE
+Numero di body per processo: 1000, numero iterazioni: 10
+Tempo di esecuzione: 0.179      Numero di bodies: 1000  Numero di processi: 1   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 0.354      Numero di bodies: 2000  Numero di processi: 2   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 0.726      Numero di bodies: 4000  Numero di processi: 4   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 1.470      Numero di bodies: 8000  Numero di processi: 8   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 2.210      Numero di bodies: 12000 Numero di processi: 12  programma: nbody3       iterazioni:10
+Tempo di esecuzione: 2.946      Numero di bodies: 16000 Numero di processi: 16  programma: nbody3       iterazioni:10
+
+
+
+Numero di body per processo: 2000, numero iterazioni: 10
+Tempo di esecuzione: 0.704      Numero di bodies: 2000  Numero di processi: 1   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 1.418      Numero di bodies: 4000  Numero di processi: 2   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 2.841      Numero di bodies: 8000  Numero di processi: 4   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 5.825      Numero di bodies: 16000 Numero di processi: 8   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 8.860      Numero di bodies: 24000 Numero di processi: 12  programma: nbody3       iterazioni:10
+Tempo di esecuzione: 11.617     Numero di bodies: 32000 Numero di processi: 16  programma: nbody3       iterazioni:10
+
+
+
+Numero di body per processo: 4000, numero iterazioni: 10
+Tempo di esecuzione: 2.823      Numero di bodies: 4000  Numero di processi: 1   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 5.669      Numero di bodies: 8000  Numero di processi: 2   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 11.334     Numero di bodies: 16000 Numero di processi: 4   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 23.274     Numero di bodies: 32000 Numero di processi: 8   programma: nbody3       iterazioni:10
+Tempo di esecuzione: 44.087     Numero di bodies: 48000 Numero di processi: 12  programma: nbody3       iterazioni:10
+Tempo di esecuzione: 63.017     Numero di bodies: 64000 Numero di processi: 16  programma: nbody3       iterazioni:10

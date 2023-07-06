@@ -62,6 +62,7 @@ int main(int argc, char** argv) {
 	double start, end;
 	start = MPI_Wtime();
 	
+	// inizializzazione delle variabili
 	int world_size;
 	int myrank;
 	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
@@ -90,6 +91,7 @@ int main(int argc, char** argv) {
 
 	MPI_Type_contiguous(6, MPI_FLOAT, &bodyDataType);
 	MPI_Type_commit(&bodyDataType);
+	// fine inizializzazione
 	
 	for (int iter = 1; iter <= nIters; iter++) {
 		MPI_Bcast(p, nBodies, bodyDataType, 0, MPI_COMM_WORLD);

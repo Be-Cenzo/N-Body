@@ -3,39 +3,40 @@
 #include <stdlib.h>
 #include <mpi.h>
 #include "correctness.h"
+#include <string.h>
 
 #define SOFTENING 1e-9f
 
 typedef struct { float x, y, z, vx, vy, vz; } Body;
 
 void randomizeBodies(float *data, int n) {
-	for (int i = 0; i < n; i++) {
-		data[i] = 2.0f * (rand() / (float)RAND_MAX) - 1.0f;
-	}
-}
-
-void bodyForce(Body *p, float dt, int offset, int n, int allBodies) {
-	#pragma omp parallel for schedule(dynamic)
-	for (int i = 0; i < n; i++) {
-		int myIndex = i + offset;
-		float Fx = 0.0f; float Fy = 0.0f; float Fz = 0.0f;
-
-		for (int j = 0; j < allBodies; j++) {
-			float dx = p[j].x - p[myIndex].x;
-			float dy = p[j].y - p[myIndex].y;
-			float dz = p[j].z - p[myIndex].z;
-			float distSqr = dx*dx + dy*dy + dz*dz + SOFTENING;
-			float invDist = 1.0f / sqrtf(distSqr);
-			float invDist3 = invDist * invDist * invDist;
-
-			Fx += dx * invDist3; Fy += dy * invDist3; Fz += dz * invDist3;
-		}
-
-		p[myIndex].vx += dt*Fx; p[myIndex].vy += dt*Fy; p[myIndex].vz += dt*Fz;
+  for (int i = 0; i < n; i++) {
+    data[i] = 2.0f * (rand() / (float)RAND_MAX) - 1.0f;
   }
 }
 
-void myBodyForces(Body *p, Body *myBodies, float dt, int offset, int n){
+void bodyForce(Body *p, float dt, int offset, int n, int allBodies) {
+    #pragma omp parallel for schedule(dynamic)
+    for (int i = 0; i < n; i++) {
+        int myIndex = i + offset;
+        float Fx = 0.0f; float Fy = 0.0f; float Fz = 0.0f;
+
+        for (int j = 0; j < allBodies; j++) {
+            float dx = p[j].x - p[myIndex].x;
+            float dy = p[j].y - p[myIndex].y;
+            float dz = p[j].z - p[myIndex].z;
+            float distSqr = dx*dx + dy*dy + dz*dz + SOFTENING;
+            float invDist = 1.0f / sqrtf(distSqr);
+            float invDist3 = invDist * invDist * invDist;
+
+            Fx += dx * invDist3; Fy += dy * invDist3; Fz += dz * invDist3;
+        }
+
+        p[myIndex].vx += dt*Fx; p[myIndex].vy += dt*Fy; p[myIndex].vz += dt*Fz;
+    }
+}
+
+void myBodyForces(Body *p, float dt, int offset, int n){
   	for (int i = 0; i < n; i++) {
 		int myIndex = i + offset;
 		float Fx = 0.0f; float Fy = 0.0f; float Fz = 0.0f;
@@ -50,61 +51,27 @@ void myBodyForces(Body *p, Body *myBodies, float dt, int offset, int n){
 
 			Fx += dx * invDist3; Fy += dy * invDist3; Fz += dz * invDist3;
 		}
-
 		p[myIndex].vx += dt*Fx; p[myIndex].vy += dt*Fy; p[myIndex].vz += dt*Fz;
-		myBodies[i].vx = p[myIndex].vx;
-		myBodies[i].vy = p[myIndex].vy;
-		myBodies[i].vz = p[myIndex].vz;
-		myBodies[i].x = p[myIndex].x;
-		myBodies[i].y = p[myIndex].y;
-		myBodies[i].z = p[myIndex].z;
   	}
 }
 
-void mergeBodies(Body *p, Body *myBodies, int offset, int n){
-	for(int i = offset; i < n + offset; i++){
-		p[i].vx = myBodies[i - offset].vx;
-		p[i].vy = myBodies[i - offset].vy;
-		p[i].vz = myBodies[i - offset].vz;
-		p[i].x = myBodies[i - offset].x;
-		p[i].y = myBodies[i - offset].y;
-		p[i].z = myBodies[i - offset].z;
-	}
-}
-
-void otherBodyForces(Body *p, float dt, int offset, int n, int allBodies){
-  	for (int i = 0; i < n; i++) {
+void otherBodyForces(Body *p, float dt, int offset, int dim, int otherOffset, int otherDim, Body *others){
+    for (int i = 0; i < dim; i++) {
 		int myIndex = i + offset;
 		float Fx = 0.0f; float Fy = 0.0f; float Fz = 0.0f;
 
-		for(int j = 0; j < offset; j++){
-			float dx = p[j].x - p[myIndex].x;
-			float dy = p[j].y - p[myIndex].y;
-			float dz = p[j].z - p[myIndex].z;
-			float distSqr = dx*dx + dy*dy + dz*dz + SOFTENING;
+        for (int j = otherOffset; j < otherDim + otherOffset; j++) {
+            float dx = others[j].x - p[myIndex].x;
+			float dy = others[j].y - p[myIndex].y;
+			float dz = others[j].z - p[myIndex].z;
+            float distSqr = dx*dx + dy*dy + dz*dz + SOFTENING;
 			float invDist = 1.0f / sqrtf(distSqr);
 			float invDist3 = invDist * invDist * invDist;
-
+            
 			Fx += dx * invDist3; Fy += dy * invDist3; Fz += dz * invDist3;
-		}
-
-		for(int j = offset + n; j < allBodies; j++){
-			float dx = p[j].x - p[myIndex].x;
-			float dy = p[j].y - p[myIndex].y;
-			float dz = p[j].z - p[myIndex].z;
-			float distSqr = dx*dx + dy*dy + dz*dz + SOFTENING;
-			float invDist = 1.0f / sqrtf(distSqr);
-			float invDist3 = invDist * invDist * invDist;
-
-			Fx += dx * invDist3; Fy += dy * invDist3; Fz += dz * invDist3;
-		}
-
+        }
 		p[myIndex].vx += dt*Fx; p[myIndex].vy += dt*Fy; p[myIndex].vz += dt*Fz;
   	}
-}
-
-void bodyPrint(Body *p){
-  	printf("x: %.4f, y: %.4f, z: %.4f, vx: %.2f, vy: %.2f, vz: %.2f\n", p->x, p->y, p->z, p->vx, p->vy, p->vz);
 }
 
 void calculateDisplacements(int nBodies, int processes, int myrank, int* dim, int* offset, int* receive_counts, int* displacements){
@@ -127,29 +94,49 @@ void calculateDisplacements(int nBodies, int processes, int myrank, int* dim, in
 	*offset = displacements[myrank];
 }
 
+void sendAndReceive(int world_size, int myrank, Body *myBodies, int displacements[], int receive_counts[], MPI_Datatype bodyDataType, MPI_Request requests[], Body *rcv){
+	for(int i = 0; i<world_size; i++){
+        if(i == myrank)
+            MPI_Ibcast(myBodies, receive_counts[myrank], bodyDataType, i, MPI_COMM_WORLD, &requests[myrank]);
+        else
+            MPI_Ibcast(rcv + displacements[i], receive_counts[i], bodyDataType, i, MPI_COMM_WORLD, &requests[i]);
+    }
+}
+
+
+void loadBuffer(Body* from, int offset, int dim, Body* to){
+	int myIndex = offset;
+	for(int i = 0; i < dim ; i++){
+		to[i].vx = from[myIndex].vx;
+		to[i].vy = from[myIndex].vy;
+		to[i].vz = from[myIndex].vz;
+		to[i].x = from[myIndex].x;
+		to[i].y = from[myIndex].y;
+		to[i].z = from[myIndex].z;
+		myIndex++;
+	}
+}
+
 int main(int argc, char** argv) {
+	srand(0);
 	MPI_Init(&argc, &argv);
 	
-	char* risultati = argc > 3 ? argv[3] : "results.txt";
-
+	char* risultati = argc > 3 ? argv[3] : "output.txt";
+	
 	double start, end;
 	start = MPI_Wtime();
 	
+	// inizializzazione variabili
 	int world_size;
-	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 	int myrank;
+	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
-
-	MPI_Request request;
 
 	int nBodies = 30000;
 	if (argc > 1) nBodies = atoi(argv[1]);
-	int dim = nBodies/world_size;
-	int resto = nBodies%world_size;
-	int offset = 0;
+  	int dim, offset;
 	int receive_counts[world_size];
 	int displacements[world_size];
-
 
 	calculateDisplacements(nBodies, world_size, myrank, &dim, &offset, receive_counts, displacements);
 
@@ -159,38 +146,61 @@ int main(int argc, char** argv) {
 	int bytes = nBodies*sizeof(Body);
 	float *buf = (float*)malloc(bytes);
 	Body *p = (Body*)buf;
+	Body *myBodies = malloc(dim*sizeof(Body));
 
 	randomizeBodies(buf, 6*nBodies); // Init pos / vel data
 
-	Body *myBodies = malloc(dim * sizeof(Body));
-
 	double totalTime = 0.0;
 	MPI_Datatype bodyDataType;
+	int index;
+	MPI_Status status;
+    MPI_Request *requests = (MPI_Request *)malloc(world_size * sizeof(MPI_Request));
 
 	MPI_Type_contiguous(6, MPI_FLOAT, &bodyDataType);
 	MPI_Type_commit(&bodyDataType);
+	// fine inizializzazione
+
+
+	// prima iterazione 
+	bodyForce(p, dt, offset, dim, nBodies);
+
+	for (int i = 0 ; i < dim; i++) {
+		p[i + offset].x += p[i + offset].vx*dt;
+		p[i + offset].y += p[i + offset].vy*dt;
+		p[i + offset].z += p[i + offset].vz*dt;
+	}
 	
-	for (int iter = 1; iter <= nIters; iter++) {
-		MPI_Ibcast(p, nBodies, bodyDataType, 0, MPI_COMM_WORLD, &request);
+	for (int iter = 2; iter <= nIters; iter++) {
+		// salvo la mia porzione di array in un buffer da inviare agli altri processi
+		memcpy(myBodies, p+offset, sizeof(Body)*dim);
 
-		myBodyForces(p, myBodies, dt, offset, dim);
-		MPI_Wait(&request, NULL);
-		mergeBodies(p, myBodies, offset, dim);
-		otherBodyForces(p, dt, offset, dim, nBodies);
+		// invio e ricevo dagli altri processi
+		sendAndReceive(world_size, myrank, myBodies, displacements, receive_counts, bodyDataType, requests, p);
+		
+		// calcolo le forze da applicare 
+		myBodyForces(p, dt, displacements[myrank], receive_counts[myrank]);
+		
+		// quando ricevo i body da un processo calcolo le forze da applicare tra i miei body e quelli appena ricevuti
+		for(int i = 0; i<world_size; i++){
+			MPI_Waitany(world_size, requests, &index, &status);
+			if(index != myrank)
+				otherBodyForces(p, dt, displacements[myrank], receive_counts[myrank], displacements[index], receive_counts[index], p);
+		}
 
-		for (int i = 0 ; i < dim; i++) { // integrate position
+		for (int i = 0 ; i < dim; i++) {
 			p[i + offset].x += p[i + offset].vx*dt;
 			p[i + offset].y += p[i + offset].vy*dt;
 			p[i + offset].z += p[i + offset].vz*dt;
 		}
-		
-		MPI_Gatherv(p + offset, dim, bodyDataType, p, receive_counts, displacements, bodyDataType, 0, MPI_COMM_WORLD);
 	}
+	// ottengo i risultati del calcolo
+	MPI_Gatherv(p + offset, dim, bodyDataType, p, receive_counts, displacements, bodyDataType, 0, MPI_COMM_WORLD);
 
 	free(buf);
 	free(myBodies);
-	MPI_Type_free(&bodyDataType);
 
+	MPI_Type_free(&bodyDataType);
+	
 	end = MPI_Wtime();
 	if(myrank == 0){
 		printf("Tempo di esecuzione: %0.3f\tNumero di bodies: %d\tNumero di processi: %d\tprogramma: %s\titerazioni:%d\n", end-start, nBodies, world_size, argv[0], nIters);
