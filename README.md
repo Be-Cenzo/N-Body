@@ -187,9 +187,8 @@ Per la valutazione delle prestazioni delle soluzioni sviluppate si è utilizzato
 |--------|--------|-------|-------|-------|-------|-------|
 | Nbody1 | 17.352 | 8.746 | 4.408 | 2.384 | 1.677 | 1.331 |
 | Nbody2 | 17.737 | 8.907 | 4.471 | 2.348 | 1.514 | 1.168 |
- 
-![[10000.jpg]]
 
+![img](benchmarks/10000.jpg)
 
 ### Esecuzione su 30000 body
 
@@ -198,8 +197,7 @@ Per la valutazione delle prestazioni delle soluzioni sviluppate si è utilizzato
 | Nbody1 | 156.340 | 79.127 | 39.563 | 20.085 | 13.577 | 10.103 |
 | Nbody2 | 159.652 | 80.492 | 40.304 | 21.230 | 13.770 | 10.176 |
 
-![[30000.jpg]]
-
+![img](benchmarks/30000.jpg)
 
 ### Esecuzione su 50000 body
 
@@ -208,9 +206,7 @@ Per la valutazione delle prestazioni delle soluzioni sviluppate si è utilizzato
 | Nbody1 | 437.437 | 220.423 | 110.445 | 56.190 | 37.437 | 27.911 |
 | Nbody2 | 445.525 | 225.802 | 112.507 | 63.709 | 41.667 | 31.107 |
 
-![[50000.jpg]]
-
-
+![img](benchmarks/50000.jpg)
 
 ## Scalabilità Debole
 Per quanto riguarda la scalabilità debole sono stati effettuati test con taglia dell'input pari a 1000, 2000 e 4000 body per processo, su 1, 2, 4, 8, 12, 16 processi.
@@ -221,8 +217,7 @@ Per quanto riguarda la scalabilità debole sono stati effettuati test con taglia
 | Nbody1 | 0.172 | 0.356 | 0.701 | 1.472 | 2.186 | 2.939 |
 | Nbody2 | 0.179 | 0.354 | 0.726 | 1.470 | 2.210 | 2.946 |
 
-
-![[1000.jpg]]
+![img](benchmarks/1000.jpg)
 
 ### Esecuzione su 2000 body per processo
 
@@ -231,7 +226,7 @@ Per quanto riguarda la scalabilità debole sono stati effettuati test con taglia
 | Nbody1 | 0.691 | 1.387 | 2.818 | 5.624 | 8.545 | 11.380 |
 | Nbody2 | 0.704 | 1.418 | 2.841 | 5.825 | 8.860 | 11.617 |
 
-![[2000.jpg]]
+![img](benchmarks/2000.jpg)
 
 ### Esecuzione su 4000 body per processo
 
@@ -240,11 +235,7 @@ Per quanto riguarda la scalabilità debole sono stati effettuati test con taglia
 | Nbody1 | 2.766 | 5.562 | 11.199 | 22.370 | 34.163 | 45.094 |
 | Nbody2 | 2.823 | 5.669 | 11.334 | 23.274 | 44.087 | 63.017 |
 
-
-![[4000.jpg]]
-
-
-
+![img](benchmarks/4000.jpg)
 # Conclusioni
 Possiamo affermare che entrambe le soluzioni proposte risultano essere soddisfacenti, infatti, all'aumentare del numero di processi lo speedup continua a crescere in entrambe le soluzioni, raggiungendo anche il picco di 15.6 a 16 processi.
 Tuttavia, mi aspettavo che la soluzione 2 fosse più performante, soprattutto su grandi taglie dell'input. I risultati di scalabilità forte, invece, mostrano che all'aumentare della taglia la soluzione 1 performa meglio rispetto alla soluzione 2.
